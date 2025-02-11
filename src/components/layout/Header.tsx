@@ -43,7 +43,7 @@ const Header = () => {
           <div className="manage p-2 bg-black bg-opacity-30 rounded-full">
             <AdjustIcon />
           </div>
-          <div className="cart flex px-3 py-2 rounded-full bg-black bg-opacity-30">
+          <div className="cart flex gap-2 px-3 py-2 rounded-full bg-black bg-opacity-30">
             <CartIcon />
             <span className="text-lg font-semibold">Giỏ hàng</span>
           </div>
