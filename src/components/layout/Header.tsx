@@ -1,9 +1,11 @@
+"use client";
 import Link from "next/link";
 import React from "react";
-import { BarIcon, SearchIcon, CartIcon, AdjustIcon } from "../icons";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { BarIcon, SearchIcon, CartIcon, AdjustIcon, UserIcon } from "../icons";
+import { useAuth, UserButton } from "@clerk/nextjs";
 
 const Header = () => {
+  const { userId } = useAuth();
   return (
     <div className="h-[100px] w-full bg-primary sticky">
       <div className="header-main h-full flex items-center justify-between mx-24 text-white ">
@@ -29,14 +31,14 @@ const Header = () => {
         </div>
 
         <div className="right-group flex items-center gap-3">
-          <div className="profile-button p-2 bg-black bg-opacity-30 rounded-full">
-            {/* <UserIcon /> */}
-            <SignedOut>
-              <SignInButton />
-            </SignedOut>
-            <SignedIn>
+          <div className="profile-button flex items-center p-2 bg-black bg-opacity-30 rounded-full">
+            {!userId ? (
+              <Link href="/sign-in">
+                <UserIcon />
+              </Link>
+            ) : (
               <UserButton />
-            </SignedIn>
+            )}
           </div>
           <div className="manage p-2 bg-black bg-opacity-30 rounded-full">
             <AdjustIcon />
