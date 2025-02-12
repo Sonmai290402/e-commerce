@@ -10,6 +10,6 @@ export default async function createUser(params: TCreateUserParams) {
     const newUser = await User.create(params);
     return newUser;
   } catch (error) {
-    console.log(error);
+    console.log("Error while creating user: ", error);
   }
 }

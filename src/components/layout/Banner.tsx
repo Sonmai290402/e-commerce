@@ -8,6 +8,7 @@ const Banner = () => {
         alt=""
         width={1440}
         height={1080}
+        priority={true}
         className="w-full h-[500px] object-cover"
       />
     </div>
