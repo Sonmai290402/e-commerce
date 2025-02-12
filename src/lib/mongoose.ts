@@ -1,25 +1,33 @@
-"use server";
+import mongoose, { Mongoose } from "mongoose";
 
-import mongoose from "mongoose";
+const MONGODB_URL = process.env.MONGODB_URL!;
 
-// singleton connection
+interface MongooseConn {
+  conn: Mongoose | null;
+  promise: Promise<Mongoose> | null;
+}
 
-let isConnected: boolean = false;
-export const connectToDatabase = async () => {
-  if (!process.env.MONGODB_URL) {
-    throw new Error("MONGODB_URL is not set");
-  }
-  if (isConnected) {
-    console.log("MONGODB is already connected");
-    return;
-  }
-  try {
-    await mongoose.connect(process.env.MONGODB_URL, {
+let cached: MongooseConn = (global as any).mongoose;
+
+if (!cached) {
+  cached = (global as any).mongoose = {
+    conn: null,
+    promise: null,
+  };
+}
+
+export const connect = async () => {
+  if (cached.conn) return cached.conn;
+
+  cached.promise =
+    cached.promise ||
+    mongoose.connect(MONGODB_URL, {
       dbName: "e-commerce",
+      bufferCommands: false,
+      connectTimeoutMS: 30000,
     });
-    isConnected = true;
-    console.log("Using new database connection");
-  } catch (error) {
-    console.log(error, "Error while connecting to database");
-  }
+
+  cached.conn = await cached.promise;
+
+  return cached.conn;
 };
