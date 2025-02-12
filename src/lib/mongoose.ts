@@ -7,29 +7,27 @@ interface MongooseConn {
   promise: Promise<Mongoose> | null;
 }
 
-// Khai báo kiểu dữ liệu cho biến global
-declare global {
-  var mongoose: MongooseConn | undefined;
-}
+let cached: MongooseConn = (global as any).mongoose;
 
-// Khởi tạo cached từ biến toàn cục
-let cached: MongooseConn = global.mongoose || { conn: null, promise: null };
+if (!cached) {
+  cached = (global as any).mongoose = {
+    conn: null,
+    promise: null,
+  };
+}
 
 export const connect = async () => {
   if (cached.conn) return cached.conn;
 
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URL, {
+  cached.promise =
+    cached.promise ||
+    mongoose.connect(MONGODB_URL, {
       dbName: "e-commerce",
       bufferCommands: false,
       connectTimeoutMS: 30000,
     });
-  }
 
   cached.conn = await cached.promise;
-
-  // Lưu cached vào biến global để tái sử dụng
-  global.mongoose = cached;
 
   return cached.conn;
 };
