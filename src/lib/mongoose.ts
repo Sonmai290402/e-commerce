@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URL = process.env.MONGODB_URL;
 
-if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI is not defined");
+if (!MONGODB_URL) {
+  throw new Error("MONGODB_URL is not defined");
 }
 
 let isConnected = false;
@@ -15,7 +15,7 @@ export const connectToDatabase = async () => {
   }
 
   try {
-    await mongoose.connect(MONGODB_URI, {
+    await mongoose.connect(MONGODB_URL, {
       dbName: "e-commerce",
     });
 

@@ -6,7 +6,6 @@ import { Webhook } from "svix";
 
 export async function POST(req: Request) {
   try {
-    // Lấy headers 1 lần để tối ưu hiệu suất
     const reqHeaders = headers();
     const svix_id = reqHeaders.get("svix-id");
     const svix_timestamp = reqHeaders.get("svix-timestamp");
@@ -21,7 +20,6 @@ export async function POST(req: Request) {
       return new Response("Bad Request - Missing headers", { status: 400 });
     }
 
-    // Đọc payload JSON chỉ một lần
     const payload = await req.json();
 
     const svix = new Webhook(process.env.WEBHOOK_SECRET);
@@ -39,7 +37,6 @@ export async function POST(req: Request) {
     }
 
     if (msg.type === "user.created") {
-      // Xử lý user không đồng bộ để không bị timeout
       createUser({
         username: msg.data.username!,
         name: msg.data.username!,
@@ -50,7 +47,7 @@ export async function POST(req: Request) {
         .then((user) => console.log("User created:", user))
         .catch((err) => console.error("Error creating user:", err));
 
-      return NextResponse.json({ message: "Processing" }, { status: 202 }); // Trả về nhanh để tránh timeout
+      return NextResponse.json({ message: "Processing" }, { status: 202 });
     }
 
     return new Response("OK", { status: 200 });
