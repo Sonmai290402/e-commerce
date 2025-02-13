@@ -3,50 +3,59 @@ import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
+
 export async function POST(req: Request) {
-  const svix_id = headers().get("svix-id") ?? "";
-  const svix_timestamp = headers().get("svix-timestamp") ?? "";
-  const svix_signature = headers().get("svix-signature") ?? "";
-  if (!process.env.WEBHOOK_SECRET) {
-    throw new Error("WEBHOOK_SECRET is not set");
-  }
-  if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response("Bad Request", { status: 400 });
-  }
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
-
-  const sivx = new Webhook(process.env.WEBHOOK_SECRET);
-
-  let msg: WebhookEvent;
-
   try {
-    msg = sivx.verify(body, {
-      "svix-id": svix_id,
-      "svix-timestamp": svix_timestamp,
-      "svix-signature": svix_signature,
-    }) as WebhookEvent;
-  } catch (err) {
-    console.log("POST ~ err:", err);
-    return new Response("Bad Request", { status: 400 });
-  }
+    // Lấy headers 1 lần để tối ưu hiệu suất
+    const reqHeaders = headers();
+    const svix_id = reqHeaders.get("svix-id");
+    const svix_timestamp = reqHeaders.get("svix-timestamp");
+    const svix_signature = reqHeaders.get("svix-signature");
 
-  const eventType = msg.type;
-  if (eventType === "user.created") {
-    // create user to database
-    const { id, username, email_addresses, image_url } = msg.data;
-    const user = await createUser({
-      username: username!,
-      name: username!,
-      clerkId: id,
-      email: email_addresses[0].email_address,
-      avatar: image_url,
-    });
-    return NextResponse.json({
-      message: "OK",
-      user,
-    });
-  }
+    if (!process.env.WEBHOOK_SECRET) {
+      console.error("WEBHOOK_SECRET is missing");
+      return new Response("Server Error", { status: 500 });
+    }
 
-  return new Response("OK", { status: 200 });
+    if (!svix_id || !svix_timestamp || !svix_signature) {
+      return new Response("Bad Request - Missing headers", { status: 400 });
+    }
+
+    // Đọc payload JSON chỉ một lần
+    const payload = await req.json();
+
+    const svix = new Webhook(process.env.WEBHOOK_SECRET);
+    let msg: WebhookEvent;
+
+    try {
+      msg = svix.verify(JSON.stringify(payload), {
+        "svix-id": svix_id,
+        "svix-timestamp": svix_timestamp,
+        "svix-signature": svix_signature,
+      }) as WebhookEvent;
+    } catch (err) {
+      console.error("Webhook verification failed:", err);
+      return new Response("Bad Request - Invalid signature", { status: 400 });
+    }
+
+    if (msg.type === "user.created") {
+      // Xử lý user không đồng bộ để không bị timeout
+      createUser({
+        username: msg.data.username!,
+        name: msg.data.username!,
+        clerkId: msg.data.id,
+        email: msg.data.email_addresses[0].email_address,
+        avatar: msg.data.image_url,
+      })
+        .then((user) => console.log("User created:", user))
+        .catch((err) => console.error("Error creating user:", err));
+
+      return NextResponse.json({ message: "Processing" }, { status: 202 }); // Trả về nhanh để tránh timeout
+    }
+
+    return new Response("OK", { status: 200 });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
 }
