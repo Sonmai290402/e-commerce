@@ -1,5 +1,5 @@
 import { EUserRole, EUserStatus } from "@/types/enums";
-import { Document, Schema, model, models } from "mongoose";
+import { Schema, model, models } from "mongoose";
 
 export interface IUser {
   clerkId: string;
