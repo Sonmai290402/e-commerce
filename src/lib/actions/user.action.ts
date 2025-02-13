@@ -7,6 +7,7 @@ import { connectToDatabase } from "../mongoose";
 export default async function createUser(params: TCreateUserParams) {
   try {
     await connectToDatabase();
+    console.log("Creating user with params:", params);
     const newUser = await User.create(params);
     return newUser;
   } catch (error) {
