@@ -15,9 +15,10 @@ export const connectToDatabase = async () => {
   }
 
   try {
-    const db = await mongoose.connect(MONGODB_URI, {
-      dbName: "your_db_name",
+    await mongoose.connect(MONGODB_URI, {
+      dbName: "e-commerce",
     });
+
     isConnected = true;
     console.log("Database connected successfully!");
   } catch (error) {
