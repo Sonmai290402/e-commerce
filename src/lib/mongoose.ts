@@ -1,25 +1,26 @@
-"use server";
-
 import mongoose from "mongoose";
 
-// singleton connection
+const MONGODB_URI = process.env.MONGODB_URI;
 
-let isConnected: boolean = false;
+if (!MONGODB_URI) {
+  throw new Error("MONGODB_URI is not defined");
+}
+
+let isConnected = false;
+
 export const connectToDatabase = async () => {
-  if (!process.env.MONGODB_URL) {
-    throw new Error("MONGODB_URL is not set");
-  }
   if (isConnected) {
-    console.log("MONGODB is already connected");
+    console.log("Using existing database connection");
     return;
   }
+
   try {
-    await mongoose.connect(process.env.MONGODB_URL, {
-      dbName: "e-commerce",
+    const db = await mongoose.connect(MONGODB_URI, {
+      dbName: "your_db_name",
     });
     isConnected = true;
-    console.log("Using new database connection");
+    console.log("Database connected successfully!");
   } catch (error) {
-    console.log(error, "Error while connecting to database");
+    console.error("Database connection failed:", error);
   }
 };
