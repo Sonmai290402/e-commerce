@@ -1,7 +1,7 @@
 import { EUserRole, EUserStatus } from "@/types/enums";
 import { Document, Schema, model, models } from "mongoose";
 
-export interface IUser extends Document {
+export interface IUser {
   clerkId: string;
   name: string;
   username: string;
@@ -11,7 +11,7 @@ export interface IUser extends Document {
   role: EUserRole;
   created_at: Date;
 }
-const userSchema = new Schema({
+const userSchema = new Schema<IUser>({
   clerkId: {
     type: String,
   },
