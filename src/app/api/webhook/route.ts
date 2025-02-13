@@ -37,17 +37,24 @@ export async function POST(req: Request) {
     }
 
     if (msg.type === "user.created") {
-      createUser({
-        username: msg.data.username!,
-        name: msg.data.username!,
-        clerkId: msg.data.id,
-        email: msg.data.email_addresses[0].email_address,
-        avatar: msg.data.image_url,
-      })
-        .then((user) => console.log("User created:", user))
-        .catch((err) => console.error("Error creating user:", err));
+      try {
+        const user = await createUser({
+          username: msg.data.username!,
+          name: msg.data.username!,
+          clerkId: msg.data.id,
+          email: msg.data.email_addresses[0].email_address,
+          avatar: msg.data.image_url,
+        });
 
-      return NextResponse.json({ message: "Processing" }, { status: 202 });
+        console.log("✅ User created:", user);
+        return NextResponse.json(
+          { message: "User created successfully" },
+          { status: 201 }
+        );
+      } catch (err) {
+        console.error("❌ Error creating user:", err);
+        return new Response("Failed to create user", { status: 500 });
+      }
     }
 
     return new Response("OK", { status: 200 });
