@@ -8,7 +8,7 @@ export default async function createUser(params: TCreateUserParams) {
   try {
     await connectToDatabase();
     const newUser = await User.create(params);
-    return JSON.parse(JSON.stringify(newUser));
+    return newUser;
   } catch (error) {
     console.error("Error creating user:", error);
   }
