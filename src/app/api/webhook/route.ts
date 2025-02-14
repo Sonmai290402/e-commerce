@@ -1,6 +1,7 @@
 import createUser from "@/lib/actions/user.action";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
+import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 
 export async function POST(req: Request) {
@@ -36,23 +37,24 @@ export async function POST(req: Request) {
     }
 
     if (msg.type === "user.created") {
-      // ✅ Trả về phản hồi ngay lập tức
-      (async () => {
-        try {
-          await createUser({
-            username: msg.data.username!,
-            name: msg.data.username!,
-            clerkId: msg.data.id,
-            email: msg.data.email_addresses[0].email_address,
-            avatar: msg.data.image_url,
-          });
-          console.log("✅ User created successfully");
-        } catch (err) {
-          console.error("❌ Error creating user:", err);
-        }
-      })();
+      try {
+        const user = await createUser({
+          username: msg.data.username!,
+          name: msg.data.username!,
+          clerkId: msg.data.id,
+          email: msg.data.email_addresses[0].email_address,
+          avatar: msg.data.image_url,
+        });
 
-      return new Response("Processing in background", { status: 202 });
+        console.log("✅ User created:", user);
+        return NextResponse.json(
+          { message: "User created successfully" },
+          { status: 201 }
+        );
+      } catch (err) {
+        console.error("❌ Error creating user:", err);
+        return new Response("Failed to create user", { status: 500 });
+      }
     }
 
     return new Response("OK", { status: 200 });
