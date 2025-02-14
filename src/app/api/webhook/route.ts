@@ -37,24 +37,27 @@ export async function POST(req: Request) {
     }
 
     if (msg.type === "user.created") {
-      try {
-        const user = await createUser({
-          username: msg.data.username!,
-          name: msg.data.username!,
-          clerkId: msg.data.id,
-          email: msg.data.email_addresses[0].email_address,
-          avatar: msg.data.image_url,
-        });
+      // ✅ Trả về phản hồi ngay lập tức để tránh timeout
+      (async () => {
+        try {
+          console.time("⏳ createUser execution time");
+          await createUser({
+            username: msg.data.username!,
+            name: msg.data.username!,
+            clerkId: msg.data.id,
+            email: msg.data.email_addresses[0].email_address,
+            avatar: msg.data.image_url,
+          });
+          console.timeEnd("⏳ createUser execution time");
+          console.log("✅ User created successfully");
+        } catch (err) {
+          console.error("❌ Error creating user:", err);
+        }
+      })();
 
-        console.log("✅ User created:", user);
-        return NextResponse.json(
-          { message: "User created successfully" },
-          { status: 201 }
-        );
-      } catch (err) {
-        console.error("❌ Error creating user:", err);
-        return new Response("Failed to create user", { status: 500 });
-      }
+      return new Response("Processing user creation in background", {
+        status: 202,
+      });
     }
 
     return new Response("OK", { status: 200 });
