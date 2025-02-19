@@ -3,3 +3,7 @@ export { default as SearchIcon } from "./SearchIcon";
 export { default as UserIcon } from "./UserIcon";
 export { default as CartIcon } from "./CartIcon";
 export { default as AdjustIcon } from "./AdjustIcon";
+export { default as LeftArrow } from "./LeftArrow";
+export { default as UserManage } from "./UserManage";
+export { default as ProductManage } from "./ProductManage";
+export { default as TagIcon } from "./TagIcon";

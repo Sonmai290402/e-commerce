@@ -2,6 +2,7 @@ import { EUserRole, EUserStatus } from "@/types/enums";
 import { Schema, model, models } from "mongoose";
 
 export interface IUser {
+  _id: string;
   clerkId: string;
   name: string;
   username: string;

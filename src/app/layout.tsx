@@ -1,5 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
+import { ToastContainer } from "react-toastify";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <ClerkProvider>
-        <body className="font-primary">{children}</body>
+        <body className="font-primary">
+          {children}
+          <ToastContainer
+            autoClose={2000}
+            className="text-sm font-medium"
+            position="top-right"
+          />
+        </body>
       </ClerkProvider>
     </html>
   );

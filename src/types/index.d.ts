@@ -1,3 +1,14 @@
+type TActiveLinkProps = {
+  url: string;
+  children: React.ReactNode;
+};
+
+type TMenuItem = {
+  url: string;
+  title: string;
+  icon?: React.ReactNode;
+};
+
 type TCreateUserParams = {
   clerkId: string;
   username: string;
@@ -5,4 +16,23 @@ type TCreateUserParams = {
   name?: string;
   avatar?: string;
 };
-export { TCreateUserParams };
+
+type TCreateProductParams = {
+  category: string;
+  subCategory: string;
+  title: string;
+  slug: string;
+};
+
+type TCategoryItemProps = {
+  title: string;
+  image: string;
+};
+
+export {
+  TCreateUserParams,
+  TActiveLinkProps,
+  TMenuItem,
+  TCreateProductParams,
+  TCategoryItemProps,
+};

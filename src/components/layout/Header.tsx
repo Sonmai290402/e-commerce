@@ -1,11 +1,25 @@
 "use client";
 import Link from "next/link";
-import React from "react";
 import { BarIcon, SearchIcon, CartIcon, AdjustIcon, UserIcon } from "../icons";
 import { useAuth, UserButton } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
+import { getUserRole } from "@/lib/actions/user.action";
 
 const Header = () => {
   const { userId } = useAuth();
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUserRole() {
+      if (userId) {
+        // Replace this with your actual function to get the user's role
+        const role = await getUserRole(userId);
+        setUserRole(role);
+      }
+    }
+    fetchUserRole();
+  }, [userId]);
+
   return (
     <div className="h-[100px] w-full bg-primary sticky">
       <div className="header-main h-full flex items-center justify-between mx-24 text-white ">
@@ -40,9 +54,16 @@ const Header = () => {
               <UserButton />
             )}
           </div>
-          <div className="manage p-2 bg-black bg-opacity-30 rounded-full">
-            <AdjustIcon />
-          </div>
+
+          {userRole === "ADMIN" && (
+            <Link
+              href="/manage/product"
+              className="manage p-2 bg-black bg-opacity-30 rounded-full"
+            >
+              <AdjustIcon />
+            </Link>
+          )}
+
           <div className="cart flex gap-2 px-3 py-2 rounded-full bg-black bg-opacity-30">
             <CartIcon />
             <span className="text-lg font-semibold">Giỏ hàng</span>
