@@ -12,7 +12,7 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
   const user = await getUserInfo({ userId });
   if (user && user.role !== EUserRole.ADMIN) return <NotFoundPage />;
   return (
-    <div className="wrapper grid grid-cols-[300px,minmax(0,1fr)] h-screen">
+    <div className="wrapper !bg-white grid grid-cols-[300px,minmax(0,1fr)] h-screen">
       <Sidebar />
       <div className="p-5">{children}</div>
     </div>
