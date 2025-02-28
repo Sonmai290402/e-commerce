@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# E-commerce website
 
-## Getting Started
+| A e-commerce platform built with Next.js, TypeScript, and MongoDB.
 
-First, run the development server:
+## 🚀 Introduction
 
+This is my personal project about an E-commerce Website. In this project, i am assuming to sell electronic items like phones or computers. The project provides a seamless shopping experience, including product categorization, searching and cart management.
+
+## Features
+- 🔐 **User Authentication:** Sign in and sign up using Clerk authentication.
+- 🛒 **Shopping Cart:** Add, update, or remove items from the cart.
+- 🔍 **Product Search & Filtering:** Users can search for products and filter them by categories.
+- 📝 **Admin Dashboard:** Manage products and users.
+
+## Technologies
+- [React](https://reactjs.org/) 
+- [Next.js](https://nextjs.org/)
+- [Shadcn](https://ui.shadcn.com/)
+- [Tailwind CSS](https://tailwindcss.com/) 
+- [MongoDB](https://www.mongodb.com/)
+- [Clerk](https://clerk.com/)
+
+## 🛠️ Installation & Setup
 ```bash
+# Clone the repository
+git clone https://github.com/Sonmai290402/e-commerce.git
+
+# Navigate to the project folder
+cd ecommerce-project
+
+# Install dependencies
+npm install
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📸 Screenshots
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Homepage
+![Homepage](https://drive.google.com/file/d/1hOiFdxoOyn5dlIFMIBXoo3V5uskPIzH6/view?usp=sharing)
