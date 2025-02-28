@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getUserInfo } from "@/lib/actions/user.action";

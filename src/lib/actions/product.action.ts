@@ -1,5 +1,5 @@
 "use server";
-import Product, { IProduct } from "@/database/product.model";
+import Product from "@/database/product.model";
 import { TCreateProductParams } from "@/types";
 import { TUpdateProductParams } from "@/types";
 import { connectToDatabase } from "../mongoose";
