@@ -53,7 +53,7 @@ const Search = () => {
 
       {suggestions.length > 0 && (
         <div className="absolute w-full bg-white shadow-lg mt-2 rounded-lg z-50">
-          {suggestions.map((product: IProduct) => (
+          {suggestions.slice(0, 6).map((product: IProduct) => (
             <Link
               key={product._id}
               href={`/${product.categorySlug}/${product.subCategorySlug}/${product.slug}`}
@@ -90,6 +90,14 @@ const Search = () => {
               </div>
             </Link>
           ))}
+          <div
+            className="flex items-center justify-center"
+            onClick={handleSearch}
+          >
+            <span className="text-black opacity-80 text-center p-2 cursor-pointer hover:font-semibold">
+              Xem toàn bộ kết quả tìm kiếm
+            </span>
+          </div>
         </div>
       )}
     </div>

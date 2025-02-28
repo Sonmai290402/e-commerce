@@ -39,10 +39,10 @@ export async function PATCH(
       item.quantity += 1;
     } else if (action === "decrease" && item.quantity > 1) {
       item.quantity -= 1;
-    } else {
-      return NextResponse.json(
-        { message: "Cannot decrease below 1" },
-        { status: 400 }
+    } else if (action === "decrease" && item.quantity === 1) {
+      // Nếu số lượng là 1 và giảm nữa thì xoá sản phẩm khỏi giỏ hàng
+      user.cart = user.cart.filter(
+        (cartItem: TCartItem) => cartItem._id.toString() !== id
       );
     }
 
@@ -75,8 +75,9 @@ export async function DELETE(
       return NextResponse.json({ message: "User not found" }, { status: 404 });
 
     user.cart = user.cart.filter(
-      (item: TCartItem) => item._id.toString() !== id
+      (item: TCartItem) => String(item._id) !== String(id)
     );
+
     await user.save();
 
     return NextResponse.json(user.cart);

@@ -15,6 +15,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import SkeletonLoading from "@/components/common/SkeletonLoading";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -81,9 +82,7 @@ const SearchPage = ({ params }: { params: { slug: string } }) => {
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-500">
-            Không tìm thấy sản phẩm nào.
-          </p>
+          <SkeletonLoading />
         )}
 
         {/* Phân trang */}

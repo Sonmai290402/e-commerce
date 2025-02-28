@@ -24,6 +24,7 @@ import {
 } from "@/lib/actions/localCart.action";
 import { DeleteIcon } from "@/components/icons";
 import Swal from "sweetalert2";
+import { mutate } from "swr";
 
 const CartPage = () => {
   const { items = [], isLoading, setLocalItems } = useCart();
@@ -82,7 +83,10 @@ const CartPage = () => {
     if (result.isConfirmed) {
       if (userId) {
         // Xóa trên server
-        await Promise.all(selectedItems.map((id) => removeCartItem(id)));
+        for (const id of selectedItems) {
+          await removeCartItem(id);
+        }
+        await mutate("/api/cart");
       } else {
         // Xóa trong local storage
         selectedItems.forEach((id) => removeLocalCartItem(id));
