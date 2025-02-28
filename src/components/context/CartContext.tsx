@@ -16,6 +16,7 @@ import { getLocalCart } from "@/lib/actions/localCart.action";
 // Xác định kiểu dữ liệu cho Context
 type CartContextType = {
   items: TCartItem[];
+  setLocalItems?: (items: TCartItem[]) => void;
   isLoading: boolean;
   error: Error | null;
   refreshCart: () => void;
@@ -81,6 +82,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       value={{
         items: userId ? data || [] : localItems, // Luôn đảm bảo items là một mảng
         isLoading,
+        setLocalItems,
         error,
         refreshCart: () => {
           if (userId) mutate("/api/cart");

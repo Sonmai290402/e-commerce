@@ -12,6 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import SkeletonLoading from "../common/SkeletonLoading";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -65,9 +66,9 @@ const ProductList = ({
     return <p className="text-center text-red-500">Lỗi khi tải sản phẩm.</p>;
   if (isLoading)
     return (
-      <p className="text-center text-gray-500">
-        Đang tải danh sách sản phẩm...
-      </p>
+      <div>
+        <SkeletonLoading />
+      </div>
     );
 
   return (

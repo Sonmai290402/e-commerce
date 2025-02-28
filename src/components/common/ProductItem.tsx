@@ -3,16 +3,56 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { IProduct } from "@/database/product.model";
-import { StarIcon } from "../icons";
+import { CartIcon, StarIcon } from "../icons";
+import { useAuth } from "@clerk/nextjs";
+import { useCart } from "../context/CartContext";
+import { toast } from "react-toastify";
+import { addToLocalCart } from "@/lib/actions/localCart.action";
+import { addToCart } from "@/lib/actions/cart.action";
 
 interface ProductItemProps {
   product: IProduct;
 }
 
 const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
+  const { userId } = useAuth();
+  const { refreshCart } = useCart();
   const categorySlug = product.categorySlug;
   const subCategorySlug = product.subCategorySlug;
   const productSlug = product.slug;
+
+  const handleAddToCart = async () => {
+    try {
+      if (!userId) {
+        addToLocalCart({
+          _id: product._id,
+          name: product.title,
+          price: product.price,
+          sale_price: product.sale_price,
+          categorySlug: product.categorySlug,
+          subCategorySlug: product.subCategorySlug,
+          productSlug: product.slug,
+          quantity: 1,
+        });
+      }
+      addToCart({
+        _id: product._id,
+        name: product.title,
+        price: product.price,
+        sale_price: product.sale_price,
+        categorySlug: product.categorySlug,
+        subCategorySlug: product.subCategorySlug,
+        productSlug: product.slug,
+        quantity: 1,
+      });
+
+      refreshCart(); // Cập nhật lại giỏ hàng
+      toast.success("Đã thêm sản phẩm vào giỏ hàng!");
+    } catch (error) {
+      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      toast.error("Lỗi khi thêm vào giỏ hàng!");
+    }
+  };
 
   return (
     <div
@@ -73,7 +113,14 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
           {product.rating.reduce((a, b) => a + b, 0) / product.rating.length}
         </span>
 
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-3 flex items-center justify-between gap-2">
+          <Button
+            className="bg-primary rounded-lg p-3 cursor-pointer hover:bg-opacity-80"
+            onClick={handleAddToCart}
+          >
+            <CartIcon className="size-5 " />
+          </Button>
+
           <Link
             href={`/${categorySlug}/${subCategorySlug}/${productSlug}`}
             className="block w-full"

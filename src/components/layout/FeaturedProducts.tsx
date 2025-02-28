@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { TFeaturedProductProps } from "@/types";
 import { Button } from "../ui/button";
+import SkeletonLoading from "../common/SkeletonLoading";
 
 const FeaturedProducts = () => {
   const [products, setProducts] = useState<TFeaturedProductProps[]>([]);
@@ -21,9 +22,7 @@ const FeaturedProducts = () => {
   }, []);
 
   if (!products.length) {
-    return (
-      <p className="text-center text-gray-500">Đang tải sản phẩm nổi bật...</p>
-    );
+    return <SkeletonLoading />;
   }
 
   return (
@@ -60,9 +59,9 @@ const FeaturedProducts = () => {
                   {product.title}
                 </h3>
 
-                <div className="mt-auto pt-4 flex flex-col gap-2">
+                <div className="mt-auto flex flex-col gap-2">
                   {product.sale_price ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-2">
                       <span className="text-gray-600 text-sm mt-1 line-through">
                         {product.price
                           ? `${product.price.toLocaleString()}đ`

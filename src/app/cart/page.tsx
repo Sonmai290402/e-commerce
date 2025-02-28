@@ -18,16 +18,17 @@ import Link from "next/link";
 import { removeCartItem, updateCartItem } from "@/lib/actions/cart.action";
 import { useAuth } from "@clerk/nextjs";
 import {
+  getLocalCart,
   removeLocalCartItem,
   updateLocalCartItem,
 } from "@/lib/actions/localCart.action";
 import { DeleteIcon } from "@/components/icons";
+import Swal from "sweetalert2";
 
 const CartPage = () => {
-  const { items = [], isLoading } = useCart();
+  const { items = [], isLoading, setLocalItems } = useCart();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const { userId } = useAuth();
-
   useEffect(() => {
     document.title = "Giỏ hàng";
   }, []);
@@ -67,17 +68,59 @@ const CartPage = () => {
     );
   const handleRemoveSelectedItems = async () => {
     if (selectedItems.length === 0) return;
+    const result = await Swal.fire({
+      title: "Bạn có chắc chắn muốn xóa các sản phẩm đã chọn?",
+      text: "Hành động này không thể hoàn tác!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có!",
+      cancelButtonText: "Hủy",
+    });
 
-    if (userId) {
-      // Xóa trên server
-      await Promise.all(selectedItems.map((id) => removeCartItem(id)));
-    } else {
-      // Xóa trong local storage
-      selectedItems.forEach((id) => removeLocalCartItem(id));
+    if (result.isConfirmed) {
+      if (userId) {
+        // Xóa trên server
+        await Promise.all(selectedItems.map((id) => removeCartItem(id)));
+      } else {
+        // Xóa trong local storage
+        selectedItems.forEach((id) => removeLocalCartItem(id));
+        if (setLocalItems) {
+          setLocalItems(getLocalCart());
+        }
+      }
+      setSelectedItems([]);
+
+      Swal.fire("Đã xóa!", "Các sản phẩm đã được xóa.", "success");
     }
+  };
 
-    // Cập nhật state
-    setSelectedItems([]);
+  const handleRemoveItem = async (id: string) => {
+    const result = await Swal.fire({
+      title: "Bạn có chắc chắn muốn xóa sản phẩm này?",
+      text: "Hành động này không thể hoàn tác!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có!",
+      cancelButtonText: "Hủy",
+    });
+    if (result.isConfirmed) {
+      if (userId) {
+        // Xóa trên server
+        await removeCartItem(id);
+      } else {
+        // Xóa trong local storage
+        removeLocalCartItem(id);
+        if (setLocalItems) {
+          setLocalItems(getLocalCart());
+        }
+      }
+      setSelectedItems([]);
+      Swal.fire("Đã xóa!", "Sản phẩm đã được xóa.", "success");
+    }
   };
 
   return (
@@ -147,11 +190,16 @@ const CartPage = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() =>
-                            userId
-                              ? updateCartItem(item._id, "decrease")
-                              : updateLocalCartItem(item._id, "decrease")
-                          }
+                          onClick={() => {
+                            if (userId) {
+                              updateCartItem(item._id, "decrease");
+                            } else {
+                              updateLocalCartItem(item._id, "decrease");
+                              if (setLocalItems) {
+                                setLocalItems(getLocalCart());
+                              }
+                            }
+                          }}
                         >
                           -
                         </Button>
@@ -159,11 +207,16 @@ const CartPage = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() =>
-                            userId
-                              ? updateCartItem(item._id, "increase")
-                              : updateLocalCartItem(item._id, "increase")
-                          }
+                          onClick={() => {
+                            if (userId) {
+                              updateCartItem(item._id, "increase");
+                            } else {
+                              updateLocalCartItem(item._id, "increase");
+                              if (setLocalItems) {
+                                setLocalItems(getLocalCart());
+                              }
+                            }
+                          }}
                         >
                           +
                         </Button>
@@ -179,11 +232,9 @@ const CartPage = () => {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() =>
-                          userId
-                            ? removeCartItem(item._id)
-                            : removeLocalCartItem(item._id)
-                        }
+                        onClick={() => {
+                          handleRemoveItem(item._id);
+                        }}
                       >
                         <DeleteIcon className="size-5" />
                       </Button>

@@ -109,7 +109,7 @@ const Page = async ({ params }: { params: { slug?: string[] } }) => {
       cats.find((cat) => cat.slug === slug[0])
     );
 
-    if (!category) return <h1>Danh mục không tồn tại!</h1>;
+    if (!category) return <NotFoundPage />;
 
     return (
       <div className="min-h-screen flex flex-col">
@@ -128,12 +128,12 @@ const Page = async ({ params }: { params: { slug?: string[] } }) => {
     const categories = await getCategories();
     const category = categories.find((cat) => slug[0] === cat.slug);
 
-    if (!category) return <h1>Danh mục không tồn tại!</h1>;
+    if (!category) return <NotFoundPage />;
 
     const subCategories = await getSubCategories(category._id);
     const subCategory = subCategories.find((sub) => sub.slug === slug[1]);
 
-    if (!subCategory) return <h1>Danh mục con không tồn tại!</h1>;
+    if (!subCategory) return <NotFoundPage />;
 
     return (
       <div className="min-h-screen flex flex-col">
@@ -154,7 +154,7 @@ const Page = async ({ params }: { params: { slug?: string[] } }) => {
     const categories = await getCategories();
     const category = categories.find((cat) => slug[0] === cat.slug);
 
-    if (!category) return <h1>Danh mục không tồn tại!</h1>;
+    if (!category) return <NotFoundPage />;
 
     const subCategories = await getSubCategories(category._id);
     const subCategory = subCategories.find((sub) => sub.slug === slug[1]);
@@ -166,7 +166,7 @@ const Page = async ({ params }: { params: { slug?: string[] } }) => {
       (prod: { slug: string }) => prod.slug === slug[2]
     );
 
-    if (!product) return <h1>Sản phẩm không tồn tại!</h1>;
+    if (!product) return <NotFoundPage />;
 
     return (
       <div className="min-h-screen flex flex-col">

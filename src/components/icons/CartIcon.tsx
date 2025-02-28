@@ -1,6 +1,6 @@
-import React from "react";
+import React, { ComponentProps } from "react";
 
-const CartIcon = () => {
+const CartIcon = (props: ComponentProps<"svg">) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -8,7 +8,7 @@ const CartIcon = () => {
       viewBox="0 0 24 24"
       strokeWidth="1.5"
       stroke="white"
-      className="size-6"
+      {...props}
     >
       <path
         strokeLinecap="round"

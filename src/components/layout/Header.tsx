@@ -60,7 +60,7 @@ const Header = () => {
             href="/cart"
             className="cart flex gap-2 px-3 py-2 rounded-full bg-black bg-opacity-30 relative hover:opacity-85"
           >
-            <CartIcon />
+            <CartIcon className="size-6" />
             <span className="hidden sm:inline text-lg font-semibold">
               Giỏ hàng
             </span>
