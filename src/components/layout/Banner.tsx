@@ -8,7 +8,7 @@ import "swiper/css/navigation";
 
 const Banner = () => {
   return (
-    <div className="w-full h-[500px] relative">
+    <div className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] xl:h-[600px] relative">
       <Swiper
         modules={[Autoplay, Pagination, Navigation]}
         spaceBetween={10}
@@ -24,12 +24,13 @@ const Banner = () => {
           "https://tomindia.s3.ap-south-1.amazonaws.com/prod/uploads/banner/FatF8x8ZtTwAGwIxaRbW_Samsung-Galaxy-S25-Ultra_TomorrowsIndia.jpg",
         ].map((src, index) => (
           <SwiperSlide key={index}>
-            <div className="relative w-full h-[500px]">
+            <div className="relative w-full h-full">
               <Image
                 src={src}
                 alt={`Slide ${index + 1}`}
                 fill
-                priority
+                priority={index === 0}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
                 className="object-cover rounded-lg"
               />
             </div>

@@ -3,12 +3,26 @@ import { Schema, model, models } from "mongoose";
 export interface ISubCategory {
   _id: string;
   title: string;
+  slug: string;
+  categorySlug: string;
   image: string;
+  categoryId: Schema.Types.ObjectId;
   product: Schema.Types.ObjectId[];
 }
 const subCategorySchema = new Schema<ISubCategory>({
   title: {
     type: String,
+    required: true,
+  },
+  slug: {
+    type: String,
+  },
+  categorySlug: {
+    type: String,
+  },
+  categoryId: {
+    type: Schema.Types.ObjectId,
+    ref: "Category",
     required: true,
   },
   image: {

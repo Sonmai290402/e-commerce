@@ -1,31 +1,20 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createSubCategory } from "@/lib/actions/subCategory.action";
-import { getCategories } from "@/lib/actions/category.action";
 import { toast } from "react-toastify";
+import slugify from "slugify";
+import useSWR from "swr";
+import { getCategories } from "@/lib/actions/category.action";
 
 export default function CreateSubCategory() {
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [categories, setCategories] = useState<
-    { _id: string; title: string }[]
-  >([]);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const res = await getCategories();
-        setCategories(res || []);
-      } catch {
-        console.error("Lỗi khi lấy danh mục");
-        setCategories([]);
-      }
-    }
-    fetchCategories();
-  }, []);
+  const { data: categories = [] } = useSWR("categories", getCategories);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,9 +22,17 @@ export default function CreateSubCategory() {
       toast.error("Vui lòng nhập đủ thông tin!");
       return;
     }
+    setLoading(true);
 
     try {
-      const res = await createSubCategory({ title, categoryId, image });
+      const res = await createSubCategory({
+        title,
+        slug: slugify(title, { lower: true, locale: "vi" }),
+        categoryId,
+        image,
+      });
+
+      setLoading(false);
       if (res.success) {
         toast.success("Thêm danh mục con thành công!");
         setTitle("");
@@ -45,6 +42,7 @@ export default function CreateSubCategory() {
         toast.error(res.message);
       }
     } catch {
+      setLoading(false);
       toast.error("Đã xảy ra lỗi khi thêm danh mục con.");
     }
   }
@@ -76,8 +74,13 @@ export default function CreateSubCategory() {
         onChange={(e) => setImage(e.target.value)}
         placeholder="URL hình ảnh"
       />
-      <Button type="submit" className="w-full">
-        Thêm
+      <Button
+        variant="default"
+        type="submit"
+        className="w-full"
+        disabled={loading}
+      >
+        {loading ? "Đang thêm..." : "Thêm danh mục con"}
       </Button>
     </form>
   );

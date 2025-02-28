@@ -5,15 +5,22 @@ export interface IProduct {
   title: string;
   image: string;
   price: number;
-  brand: string;
   sale_price: number;
   slug: string;
-  desc: string;
   created_at: Date;
+  capacity: string;
+  chip: string;
+  size: string;
+  screen: string;
   rating: number[];
   views: number;
+  isFeatured: boolean;
   category: Schema.Types.ObjectId;
   subCategory: Schema.Types.ObjectId;
+  categorySlug: string;
+  subCategorySlug: string;
+  ram: string;
+  card: string;
 }
 const productSchema = new Schema<IProduct>({
   title: {
@@ -22,24 +29,18 @@ const productSchema = new Schema<IProduct>({
   },
   image: {
     type: String,
-    // required: true,
+    required: true,
   },
   price: {
     type: Number,
-    // required: true,
-  },
-  brand: {
-    type: String,
+    required: true,
   },
   sale_price: {
     type: Number,
   },
   slug: {
     type: String,
-    // required: true,
-  },
-  desc: {
-    type: String,
+    required: true,
   },
   created_at: {
     type: Date,
@@ -53,6 +54,23 @@ const productSchema = new Schema<IProduct>({
     type: Number,
     default: 0,
   },
+  capacity: {
+    type: String,
+    // required: true,
+  },
+  chip: {
+    type: String,
+  },
+  size: {
+    type: String,
+  },
+  screen: {
+    type: String,
+  },
+  isFeatured: {
+    type: Boolean,
+    default: false,
+  },
   category: {
     type: Schema.Types.ObjectId,
     ref: "Category",
@@ -62,6 +80,20 @@ const productSchema = new Schema<IProduct>({
     type: Schema.Types.ObjectId,
     ref: "SubCategory",
     required: true,
+  },
+  categorySlug: {
+    type: String,
+    required: true,
+  },
+  subCategorySlug: {
+    type: String,
+    required: true,
+  },
+  ram: {
+    type: String,
+  },
+  card: {
+    type: String,
   },
 });
 const Product = models.Product || model<IProduct>("Product", productSchema);

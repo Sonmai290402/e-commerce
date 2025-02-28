@@ -3,10 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import slugify from "slugify";
+import useSWR from "swr";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,11 +34,12 @@ import { getSubCategories } from "@/lib/actions/subCategory.action";
 const formSchema = z.object({
   title: z.string().min(5, "Tên sản phẩm phải có ít nhất 5 ký tự"),
   image: z.string(),
-  price: z.number(),
-  sale_price: z.number().optional(),
-  rating: z.array(z.number()).default([5]),
-  brand: z.string(),
-  desc: z.string(),
+  price: z.coerce.number().int().positive().optional(),
+  sale_price: z.coerce.number().int().positive().optional(),
+  capacity: z.string(),
+  chip: z.string(),
+  size: z.string(),
+  screen: z.string(),
   category: z.string().min(1, "Chọn danh mục sản phẩm"),
   subCategory: z.string().min(1, "Chọn danh mục con"),
   views: z.number().default(0),
@@ -46,13 +48,13 @@ const formSchema = z.object({
 function CreateNewProduct() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [categories, setCategories] = useState<
-    { _id: string; title: string }[]
-  >([]);
-  const [subCategories, setSubCategories] = useState<
-    { _id: string; title: string }[]
-  >([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const { data: categories = [] } = useSWR("categories", getCategories);
+  const { data: subCategories = [] } = useSWR(
+    selectedCategory ? ["subCategories", selectedCategory] : null,
+    () => getSubCategories(selectedCategory)
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,58 +62,15 @@ function CreateNewProduct() {
       title: "",
       image: "",
       price: 0,
-      brand: "",
       sale_price: undefined,
-      desc: "",
+      capacity: "",
+      chip: "",
+      size: "",
+      screen: "",
       category: "",
       subCategory: "",
     },
   });
-
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const res = await getCategories();
-        setCategories(
-          Array.isArray(res)
-            ? res.map((cat: { _id: unknown; title?: string }) => ({
-                _id: String(cat._id), // Ép kiểu về string
-                title: cat.title ?? "Danh mục không tên", // Đảm bảo không undefined
-              }))
-            : []
-        );
-      } catch (error) {
-        console.error("Lỗi khi lấy danh mục:", error);
-        setCategories([]);
-      }
-    }
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    async function fetchSubCategories() {
-      if (!selectedCategory) {
-        setSubCategories([]);
-        return;
-      }
-      try {
-        const res = await getSubCategories(selectedCategory);
-        console.log("fetchSubCategories ~ res:", res);
-        setSubCategories(
-          Array.isArray(res)
-            ? res.map((sub: { _id: unknown; title?: string }) => ({
-                _id: String(sub._id),
-                title: sub.title ?? "Danh mục con không tên",
-              }))
-            : []
-        );
-      } catch (error) {
-        console.error("Lỗi khi lấy danh mục con:", error);
-        setSubCategories([]);
-      }
-    }
-    fetchSubCategories();
-  }, [selectedCategory]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -126,21 +85,18 @@ function CreateNewProduct() {
         return;
       }
       toast.success("Thêm sản phẩm thành công");
-      if (res?.data) {
-        router.replace("/manage/product");
-      }
+      router.replace("/manage/product");
     } catch {
       toast.error("Đã có lỗi xảy ra");
     } finally {
       setIsSubmitting(false);
-      form.reset();
     }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off">
-        <div className="grid grid-cols-2 gap-8 mt-10 mb-8">
+        <div className="grid grid-cols-2 gap-5 mt-5 mb-8">
           <FormField
             control={form.control}
             name="title"
@@ -229,7 +185,12 @@ function CreateNewProduct() {
               <FormItem>
                 <FormLabel>Giá *</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Giá sản phẩm" {...field} />
+                  <Input
+                    type="number"
+                    placeholder="Giá sản phẩm"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -246,6 +207,71 @@ function CreateNewProduct() {
                     type="number"
                     placeholder="Giá khuyến mãi"
                     {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="capacity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dung lượng</FormLabel>
+                <FormControl>
+                  <Input
+                    type="string"
+                    placeholder="Dung lượng sản phẩm"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="chip"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Chip</FormLabel>
+                <FormControl>
+                  <Input type="string" placeholder="Chip" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="size"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Kích thước</FormLabel>
+                <FormControl>
+                  <Input
+                    type="string"
+                    placeholder="Kích thước sản phẩm"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="screen"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Màn hình</FormLabel>
+                <FormControl>
+                  <Input
+                    type="string"
+                    placeholder="Kích thước màn hình"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -256,7 +282,8 @@ function CreateNewProduct() {
         <Button
           isLoading={isSubmitting}
           type="submit"
-          className="w-[120px]"
+          variant="default"
+          className="block mx-auto"
           disabled={isSubmitting}
         >
           Thêm sản phẩm

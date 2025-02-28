@@ -1,4 +1,4 @@
-import { createUser } from "@/lib/actions/user.action";
+import { createUser, deleteUserById } from "@/lib/actions/user.action";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -21,7 +21,6 @@ export async function POST(req: Request) {
     }
 
     const payload = await req.json();
-
     const svix = new Webhook(process.env.WEBHOOK_SECRET);
     let msg: WebhookEvent;
 
@@ -54,6 +53,25 @@ export async function POST(req: Request) {
       } catch (err) {
         console.error("❌ Error creating user:", err);
         return new Response("Failed to create user", { status: 500 });
+      }
+    }
+
+    if (msg.type === "user.deleted") {
+      try {
+        if (msg.data.id) {
+          const response = await deleteUserById(msg.data.id);
+          console.log("✅ User deleted:", response);
+          return NextResponse.json(
+            { message: "User deleted successfully" },
+            { status: 200 }
+          );
+        } else {
+          console.error("❌ Error deleting user: User ID is undefined");
+          return new Response("Failed to delete user", { status: 400 });
+        }
+      } catch (err) {
+        console.error("❌ Error deleting user:", err);
+        return new Response("Failed to delete user", { status: 500 });
       }
     }
 

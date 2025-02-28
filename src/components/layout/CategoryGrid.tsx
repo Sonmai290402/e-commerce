@@ -3,49 +3,72 @@ import React, { useEffect, useState } from "react";
 import CategoryItem from "../common/CategoryItem";
 import { getCategories } from "@/lib/actions/category.action";
 import { getAllSubCategories } from "@/lib/actions/subCategory.action";
+import { TCategoryItemProps } from "@/types";
 
 const CategoryGrid = () => {
-  const [items, setItems] = useState<
-    { _id: string; title: string; image: string; type: string }[]
-  >([]);
+  const [categories, setCategories] = useState<TCategoryItemProps[]>([]);
+  const [subCategories, setSubCategories] = useState<TCategoryItemProps[]>([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
         // Lấy danh mục chính
-        const categories = await getCategories(true);
-        const formattedCategories = categories.map((category) => ({
-          _id: category._id,
-          title: category.title,
-          image: category.image ?? "", // Nếu không có hình ảnh, để trống
-          type: "category", // Đánh dấu đây là danh mục chính
-        }));
+        const categoriesData = await getCategories(true);
+        const formattedCategories: TCategoryItemProps[] = categoriesData.map(
+          (category) => ({
+            _id: category._id,
+            title: category.title,
+            slug: category.slug,
+            image: category.image ?? "",
+            isSubCategory: false,
+          })
+        );
+        setCategories(formattedCategories);
 
         // Lấy danh mục con
-        const subCategories = await getAllSubCategories();
-        const formattedSubCategories = subCategories.map((sub) => ({
-          _id: sub._id,
-          title: sub.title,
-          image: sub.image ?? "",
-          type: "subCategory",
-        }));
-
-        // Gộp cả hai danh sách
-        setItems([...formattedCategories, ...formattedSubCategories]);
+        const subCategoriesData = await getAllSubCategories();
+        const formattedSubCategories: TCategoryItemProps[] =
+          subCategoriesData.map((sub) => ({
+            _id: sub._id,
+            title: sub.title,
+            image: sub.image ?? "",
+            slug: sub.slug,
+            categorySlug: sub.categorySlug, // Nhận từ API
+            isSubCategory: true,
+          }));
+        setSubCategories(formattedSubCategories);
       } catch (error) {
         console.error("Lỗi khi lấy danh mục và danh mục con:", error);
       }
     }
+
     fetchData();
   }, []);
 
   return (
-    <div className="mx-24 cursor-pointer">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
-        {items.map((item) => (
-          <CategoryItem key={item._id} title={item.title} image={item.image} />
-        ))}
-      </div>
+    <div className="mx-4 sm:mx-24 my-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {/* Hiển thị danh mục chính */}
+      {categories.map((category, index) => (
+        <CategoryItem
+          key={index}
+          title={category.title}
+          image={category.image}
+          slug={category.slug}
+          isSubCategory={false}
+        />
+      ))}
+
+      {/* Hiển thị danh mục con */}
+      {subCategories.map((sub, index) => (
+        <CategoryItem
+          key={index}
+          title={sub.title}
+          image={sub.image}
+          slug={sub.slug}
+          categorySlug={sub.categorySlug}
+          isSubCategory={true}
+        />
+      ))}
     </div>
   );
 };

@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createCategory } from "@/lib/actions/category.action";
 import { toast } from "react-toastify";
+import slugify from "slugify";
 
 const CreateCategory = () => {
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -15,8 +17,15 @@ const CreateCategory = () => {
       toast.error("Vui lòng nhập tên danh mục!");
       return;
     }
+    setLoading(true);
 
-    const res = await createCategory(title, image);
+    const res = await createCategory(
+      title,
+      image,
+      slugify(title, { lower: true, locale: "vi" })
+    );
+
+    setLoading(false);
     if (res.success) {
       toast.success("Thêm danh mục thành công!");
       setTitle("");
@@ -41,8 +50,13 @@ const CreateCategory = () => {
         onChange={(e) => setImage(e.target.value)}
         placeholder="URL hình ảnh"
       />
-      <Button type="submit" className="w-full">
-        Thêm danh mục
+      <Button
+        variant="default"
+        type="submit"
+        className="w-full"
+        disabled={loading}
+      >
+        {loading ? "Đang thêm..." : "Thêm danh mục"}
       </Button>
     </form>
   );

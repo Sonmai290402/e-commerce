@@ -1,6 +1,6 @@
 "use server";
 
-import User, { IUser } from "@/database/user.modal";
+import User, { IUser } from "@/database/user.model";
 import { TCreateUserParams } from "@/types";
 import { connectToDatabase } from "../mongoose";
 
@@ -40,5 +40,55 @@ export async function getUserRole(userId: string): Promise<string> {
   } catch (error) {
     console.error("Error fetching user role:", error);
     return "user"; // Default role if there's an error
+  }
+}
+
+export async function deleteUserById(userId: string) {
+  try {
+    const clerkResponse = await fetch(
+      `https://api.clerk.com/v1/users/${userId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!clerkResponse.ok) {
+      console.error(
+        "❌ Error deleting user on Clerk:",
+        await clerkResponse.text()
+      );
+      return { success: false, message: "Failed to delete user from Clerk" };
+    }
+    await connectToDatabase();
+    await User.findOneAndDelete({ clerkId: userId });
+
+    return { success: true, message: "Người dùng đã được xóa thành công" };
+  } catch (error) {
+    console.error("❌ Error deleting user:", error);
+    return { success: false, message: "Error deleting user" };
+  }
+}
+
+export async function getAllUsers(): Promise<IUser[] | undefined> {
+  try {
+    await connectToDatabase();
+    const users = await User.find();
+    return users;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+}
+
+export async function updateUserRole(userId: string, role: string) {
+  try {
+    await connectToDatabase();
+    await User.findOneAndUpdate({ clerkId: userId }, { role });
+    return { success: true, message: "Cập nhật vai trò người dùng thành công" };
+  } catch (error) {
+    console.error("Error updating user role:", error);
   }
 }

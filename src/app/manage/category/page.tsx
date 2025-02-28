@@ -1,5 +1,9 @@
 import CreateCategory from "@/components/product/CreateCategory";
 
+export const metadata = {
+  title: "Quản lý danh mục",
+};
+
 const page = () => {
   return (
     <div>

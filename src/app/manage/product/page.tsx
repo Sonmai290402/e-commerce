@@ -1,6 +1,10 @@
 import CreateNewProduct from "@/components/product/CreateNewProduct";
 import React from "react";
 
+export const metadata = {
+  title: "Quản lý sản phẩm",
+};
+
 const page = () => {
   return (
     <div>
