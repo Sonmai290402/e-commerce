@@ -3,12 +3,15 @@ import React from "react";
 import { getProductBySlug } from "@/lib/actions/product.action";
 import Image from "next/image";
 import { CardIcon, ChipIcon, ScreenIcon, StarIcon } from "../icons";
-import { useCart } from "../context/CartContext";
 import { toast } from "react-toastify";
 import { addToCart, fetchCart } from "@/lib/actions/cart.action";
 import useSWR from "swr";
+import { addToLocalCart } from "@/lib/actions/localCart.action";
+import { useAuth } from "@clerk/nextjs";
+import { useCart } from "../context/CartContext";
 
 const ProductDetails = ({ productSlug }: { productSlug: string }) => {
+  const { userId } = useAuth();
   const { refreshCart } = useCart();
 
   const { data: product, error } = useSWR(
@@ -22,7 +25,19 @@ const ProductDetails = ({ productSlug }: { productSlug: string }) => {
 
   const handleAddToCart = async () => {
     try {
-      await addToCart({
+      if (!userId) {
+        addToLocalCart({
+          _id: product._id,
+          name: product.title,
+          price: product.price,
+          sale_price: product.sale_price,
+          categorySlug: product.categorySlug,
+          subCategorySlug: product.subCategorySlug,
+          productSlug: product.slug,
+          quantity: 1,
+        });
+      }
+      addToCart({
         _id: product._id,
         name: product.title,
         price: product.price,
@@ -33,7 +48,6 @@ const ProductDetails = ({ productSlug }: { productSlug: string }) => {
         quantity: 1,
       });
 
-      console.log("Gọi refreshCart...");
       refreshCart(); // Cập nhật lại giỏ hàng
 
       console.log("Dữ liệu giỏ hàng sau khi thêm:", await fetchCart());

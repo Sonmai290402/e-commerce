@@ -10,7 +10,7 @@ export async function fetchCart() {
     return await res.json();
   } catch (error) {
     console.error("Lỗi khi tải giỏ hàng:", error);
-    return [];
+    return JSON.parse(localStorage.getItem("cart") || "[]"); // Dùng cache nếu API lỗi
   }
 }
 

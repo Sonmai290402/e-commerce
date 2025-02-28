@@ -66,7 +66,8 @@ const Header = () => {
             </span>
 
             <span className="bg-yellow-200 text-primary rounded-full absolute top-0 right-0 translate-x-0.5 -translate-y-1/3 w-5 h-5 flex items-center justify-center text-xs font-semibold">
-              {items.reduce((total, item) => total + item.quantity, 0)}
+              {Array.isArray(items) &&
+                items.reduce((total, item) => total + item.quantity, 0)}
             </span>
           </Link>
         </div>

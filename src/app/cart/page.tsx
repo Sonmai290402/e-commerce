@@ -16,10 +16,17 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
 import { removeCartItem, updateCartItem } from "@/lib/actions/cart.action";
+import { useAuth } from "@clerk/nextjs";
+import {
+  removeLocalCartItem,
+  updateLocalCartItem,
+} from "@/lib/actions/localCart.action";
+import { DeleteIcon } from "@/components/icons";
 
 const CartPage = () => {
   const { items = [], isLoading } = useCart();
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const { userId } = useAuth();
 
   useEffect(() => {
     document.title = "Giỏ hàng";
@@ -58,12 +65,37 @@ const CartPage = () => {
       (sum, item) => sum + (item.sale_price ?? item.price) * item.quantity,
       0
     );
+  const handleRemoveSelectedItems = async () => {
+    if (selectedItems.length === 0) return;
+
+    if (userId) {
+      // Xóa trên server
+      await Promise.all(selectedItems.map((id) => removeCartItem(id)));
+    } else {
+      // Xóa trong local storage
+      selectedItems.forEach((id) => removeLocalCartItem(id));
+    }
+
+    // Cập nhật state
+    setSelectedItems([]);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <div className="container mx-auto p-5">
-        <h2 className="text-2xl font-bold mb-5">Giỏ hàng</h2>
+        <div className="flex justify-between px-0 sm:px-2">
+          <h2 className="text-2xl font-bold mb-5">Giỏ hàng</h2>
+          <Button
+            variant="destructive"
+            className={`${
+              selectedItems.length > 0 ? "" : "hidden"
+            } text-base hover:opacity-80 w-fit rounded-lg`}
+            onClick={handleRemoveSelectedItems}
+          >
+            <DeleteIcon className="size-5" />
+          </Button>
+        </div>
 
         {items.length === 0 ? (
           <p className="text-center text-gray-500">
@@ -115,7 +147,11 @@ const CartPage = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => updateCartItem(item._id, "decrease")}
+                          onClick={() =>
+                            userId
+                              ? updateCartItem(item._id, "decrease")
+                              : updateLocalCartItem(item._id, "decrease")
+                          }
                         >
                           -
                         </Button>
@@ -123,7 +159,11 @@ const CartPage = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => updateCartItem(item._id, "increase")}
+                          onClick={() =>
+                            userId
+                              ? updateCartItem(item._id, "increase")
+                              : updateLocalCartItem(item._id, "increase")
+                          }
                         >
                           +
                         </Button>
@@ -139,9 +179,13 @@ const CartPage = () => {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => removeCartItem(item._id)}
+                        onClick={() =>
+                          userId
+                            ? removeCartItem(item._id)
+                            : removeLocalCartItem(item._id)
+                        }
                       >
-                        Xóa
+                        <DeleteIcon className="size-5" />
                       </Button>
                     </TableCell>
                   </TableRow>
